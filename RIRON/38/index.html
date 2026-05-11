@@ -4,88 +4,100 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>区分所有建物及びその敷地</title>
+
 <style>
-  body {
-    margin: 0;
-    font-family: system-ui, sans-serif;
-    background: #050505;
-    color: #fff;
-    line-height: 1.8;
-  }
-  section {
-    min-height: 100vh;
-    padding: 42px 24px;
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    border-bottom: 1px solid #333;
-  }
-  .title {
-    background: linear-gradient(160deg, #ff003c, #5400ff);
-  }
-  .card {
-    background: #111;
-  }
-  h1 {
-    font-size: 34px;
-    line-height: 1.3;
-    margin: 0 0 20px;
-  }
-  h2 {
-    font-size: 28px;
-    color: #ffeb3b;
-    margin-bottom: 20px;
-  }
-  .big {
-    font-size: 25px;
-    font-weight: 800;
-  }
-  .keyword {
-    color: #00ffcc;
-    font-weight: 900;
-    font-size: 1.15em;
-  }
-  .danger {
-    color: #ff4d6d;
-    font-weight: 900;
-  }
-  .check {
-    margin-top: 30px;
-    padding: 18px;
-    background: #1b1b1b;
-    border: 2px solid #00ffcc;
-    border-radius: 16px;
-    font-size: 22px;
-  }
-  details {
-    margin-top: 20px;
-    background: #181818;
-    padding: 18px;
-    border-radius: 14px;
-    border: 1px solid #444;
-  }
-  summary {
-    font-size: 22px;
-    font-weight: 900;
-    cursor: pointer;
-    color: #ffeb3b;
-  }
-  .mini {
-    font-size: 16px;
-    color: #bbb;
-  }
-  .nav {
-    position: fixed;
-    bottom: 12px;
-    right: 12px;
-    background: #00ffcc;
-    color: #000;
-    padding: 10px 14px;
-    border-radius: 999px;
-    font-weight: 900;
-    text-decoration: none;
-  }
+body{
+  margin:0;
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",sans-serif;
+  background:#050505;
+  color:white;
+  line-height:1.8;
+}
+section{
+  min-height:100vh;
+  padding:44px 24px;
+  box-sizing:border-box;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  border-bottom:1px solid #333;
+}
+.title{
+  background:linear-gradient(160deg,#ff003c,#4b00ff);
+}
+.card{
+  background:#101010;
+}
+h1{
+  font-size:34px;
+  line-height:1.25;
+}
+h2{
+  font-size:28px;
+  color:#ffeb3b;
+}
+.big{
+  font-size:24px;
+  font-weight:800;
+}
+.keyword{
+  color:#00ffcc;
+  font-weight:900;
+}
+.danger{
+  color:#ff4d6d;
+  font-weight:900;
+}
+.redsheet{
+  background:#ff1744;
+  color:transparent;
+  border-radius:8px;
+  padding:2px 8px;
+  cursor:pointer;
+  user-select:none;
+}
+.redsheet.open{
+  background:transparent;
+  color:#00ffcc;
+  font-weight:900;
+}
+details{
+  margin-top:20px;
+  background:#1b1b1b;
+  padding:18px;
+  border-radius:14px;
+  border:1px solid #444;
+}
+summary{
+  font-size:20px;
+  font-weight:900;
+  color:#ffeb3b;
+  cursor:pointer;
+}
+.check{
+  margin-top:24px;
+  padding:18px;
+  background:#181818;
+  border:2px solid #00ffcc;
+  border-radius:16px;
+  font-size:21px;
+}
+.nav{
+  position:fixed;
+  right:12px;
+  bottom:12px;
+  background:#00ffcc;
+  color:#000;
+  padding:10px 14px;
+  border-radius:999px;
+  font-weight:900;
+  text-decoration:none;
+  z-index:99;
+}
+.small{
+  color:#bbb;
+  font-size:15px;
+}
 </style>
 </head>
 
@@ -95,24 +107,22 @@
 
 <section class="title">
   <h1>区分所有建物<br>及びその敷地</h1>
-  <p class="big">まず脳に刻め。<br>これは「3点セット」だ。</p>
-  <p class="mini">専有部分 × 共用部分の共有持分 × 敷地利用権</p>
+  <p class="big">これはまず<br><span class="keyword">3点セット</span>で脳に刺す。</p>
+  <p class="small">タップで赤シート解除。もう一度タップで隠れる。</p>
 </section>
 
 <section class="card">
   <h2>定義の核</h2>
   <p class="big">
     区分所有建物及びその敷地とは、<br>
-    <span class="keyword">専有部分</span>、<br>
-    当該専有部分に係る<br>
-    <span class="keyword">共用部分の共有持分</span>、<br>
-    及び<br>
-    <span class="keyword">敷地利用権</span><br>
+    <span class="redsheet" onclick="this.classList.toggle('open')">専有部分</span>、<br>
+    <span class="redsheet" onclick="this.classList.toggle('open')">共用部分の共有持分</span>、<br>
+    <span class="redsheet" onclick="this.classList.toggle('open')">敷地利用権</span><br>
     をいう。
   </p>
 
   <details>
-    <summary>全文を確認</summary>
+    <summary>原文を見る</summary>
     <p>
       区分所有建物及びその敷地とは、建物の区分所有等に関する法律第2条第3項に規定する専有部分並びに当該専有部分に係る同条第4項に規定する共用部分の共有部分及び同条第6項に規定する敷地利用権をいう。
     </p>
@@ -123,30 +133,18 @@
   <h2>専有部分</h2>
   <p class="big">
     一棟の建物のうち、<br>
-    <span class="keyword">構造上区分</span>され、<br>
-    <span class="keyword">用途上独立性</span>を有する<br>
+    <span class="redsheet" onclick="this.classList.toggle('open')">構造上区分</span>され、<br>
+    <span class="redsheet" onclick="this.classList.toggle('open')">用途上独立性</span>を有する<br>
     建物の部分。
   </p>
-
-  <div class="check">
-    ☐ 構造上区分<br>
-    ☐ 用途上独立性
-  </div>
 </section>
 
 <section class="card">
   <h2>共用部分</h2>
   <p class="big">
-    <span class="keyword">廊下</span>、<span class="keyword">階段</span>など、<br>
-    専有部分以外の<br>
-    建物の部分等。
+    <span class="redsheet" onclick="this.classList.toggle('open')">廊下</span>、<span class="redsheet" onclick="this.classList.toggle('open')">階段</span>など、<br>
+    <span class="redsheet" onclick="this.classList.toggle('open')">専有部分以外</span>の建物の部分等。
   </p>
-
-  <div class="check">
-    ☐ 廊下<br>
-    ☐ 階段<br>
-    ☐ 専有部分以外
-  </div>
 </section>
 
 <section class="card">
@@ -154,17 +152,12 @@
   <p class="big">
     専有部分を所有するための、<br>
     建物の敷地に関する<br>
-    <span class="keyword">権利</span>。
+    <span class="redsheet" onclick="this.classList.toggle('open')">権利</span>。
   </p>
-
-  <div class="check">
-    ☐ 専有部分を所有するため<br>
-    ☐ 敷地に関する権利
-  </div>
 </section>
 
 <section class="card">
-  <h2>鑑定評価で明確にするもの</h2>
+  <h2>鑑定評価で明確にする</h2>
   <p class="big">
     鑑定評価に当たっては、<br>
     <span class="danger">内容を明確にしなければならない。</span>
@@ -175,62 +168,89 @@
     ☐ 共用部分の共有持分<br>
     ☐ 敷地利用権
   </div>
+
+  <details>
+    <summary>原文を見る</summary>
+    <p>
+      区分所有建物及びその敷地の鑑定評価に当たっては、専有部分、共用部分の共有持分及び敷地利用権の内容を明確にしなければならない。
+    </p>
+  </details>
 </section>
 
 <section class="card">
   <h2>専用使用権</h2>
   <p class="big">
-    駐車場使用権、<br>
-    バルコニー使用権など。
+    駐車場使用権、バルコニー使用権等の<br>
+    <span class="keyword">専用使用権</span>。
   </p>
   <p class="big">
-    経済価値があり、<br>
-    区分所有権に付随するなら、<br>
+    経済価値が認められ、<br>
+    区分所有権に付随する場合、<br>
     <span class="danger">経済価値の判定で考慮。</span>
   </p>
 
-  <div class="check">
-    ☐ 駐車場使用権<br>
-    ☐ バルコニー使用権<br>
-    ☐ 経済価値あり<br>
-    ☐ 区分所有権に付随
-  </div>
+  <details>
+    <summary>原文を見る</summary>
+    <p>
+      なお、敷地や共用部分に係る駐車場使用権、バルコニー使用権等のいわゆる「専用使用権」に経済価値が認められ、当該専用使用権が区分所有権に付随する場合には、区分所有建物及びその敷地の経済価値の判定に当たって考慮すべきである。
+    </p>
+  </details>
 </section>
 
 <section class="title">
-  <h2>最後の一撃</h2>
+  <h2>居住用の個別的要因</h2>
   <p class="big">
-    居住用の個別的要因は、<br>
-    主たる需要者である<br>
-    <span class="keyword">居住目的の個人</span>の観点から、<br>
-    <span class="danger">快適性</span>・<span class="danger">利便性</span><br>
-    を特に左右する要因として捉える。
+    主たる需要者は<br>
+    <span class="redsheet" onclick="this.classList.toggle('open')">居住目的の個人</span>。
   </p>
+  <p class="big">
+    特に左右するのは、<br>
+    <span class="redsheet" onclick="this.classList.toggle('open')">快適性</span>・
+    <span class="redsheet" onclick="this.classList.toggle('open')">利便性</span>。
+  </p>
+
+  <details>
+    <summary>原文を見る</summary>
+    <p>
+      居住用の区分所有建物及びその敷地に係る個別的要因（不動産に個別性を生じさせ、その価格を個別的に形成する要因）は、主たる需要者である居住目的の個人の観点から「快適性」「利便性」を特に左右する要因として捉えられ、その主なものを挙げると、以下のとおりである。
+    </p>
+  </details>
 </section>
 
 <section class="card">
   <h2>即答テスト</h2>
 
   <details>
-    <summary>Q1：3点セットは？</summary>
-    <p>専有部分・共用部分の共有持分・敷地利用権。</p>
+    <summary>Q1：区分所有建物及びその敷地の3点セットは？</summary>
+    <p>専有部分、共用部分の共有持分、敷地利用権。</p>
   </details>
 
   <details>
-    <summary>Q2：専有部分の要件は？</summary>
-    <p>構造上区分され、用途上独立性を有すること。</p>
+    <summary>Q2：専有部分とは？</summary>
+    <p>一棟の建物のうち構造上区分され、用途上独立性を有する建物の部分。</p>
   </details>
 
   <details>
     <summary>Q3：専用使用権の例は？</summary>
-    <p>駐車場使用権、バルコニー使用権など。</p>
+    <p>駐車場使用権、バルコニー使用権等。</p>
   </details>
 
   <details>
-    <summary>Q4：居住用の個別的要因は何を左右？</summary>
+    <summary>Q4：居住用の個別的要因は誰の観点？</summary>
+    <p>主たる需要者である居住目的の個人の観点。</p>
+  </details>
+
+  <details>
+    <summary>Q5：特に左右するものは？</summary>
     <p>快適性・利便性。</p>
   </details>
 </section>
+
+<script>
+document.querySelectorAll('.redsheet').forEach(el => {
+  el.setAttribute('title','タップで表示');
+});
+</script>
 
 </body>
 </html>
