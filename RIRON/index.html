@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>鑑定理論メニュー</title>
+<title>鑑定理論</title>
+
 <style>
 body{
   margin:0;
@@ -11,50 +12,66 @@ body{
   display:flex;
   justify-content:center;
   align-items:center;
-  background:linear-gradient(160deg,#050505,#1b004b);
+  background:linear-gradient(160deg,#050505,#2a0055);
   color:white;
   font-family:system-ui,"Hiragino Sans","Yu Gothic",sans-serif;
 }
 .box{
   width:90%;
   max-width:420px;
-  padding:28px;
+  padding:30px;
   background:#111;
   border:2px solid #00ffcc;
-  border-radius:22px;
-  box-shadow:0 0 30px rgba(0,255,204,.25);
+  border-radius:24px;
+  box-shadow:0 0 40px rgba(0,255,204,.3);
 }
-h1{font-size:28px;}
+h1{
+  font-size:30px;
+}
 select,button{
   width:100%;
   margin-top:18px;
   padding:16px;
   font-size:20px;
-  border-radius:14px;
   border:none;
+  border-radius:14px;
 }
 button{
   background:#00ffcc;
   color:#000;
   font-weight:900;
 }
+.small{
+  color:#bbb;
+  margin-top:18px;
+}
 </style>
 </head>
+
 <body>
 
 <div class="box">
+
   <h1>鑑定理論ページへようこそ 🐰</h1>
+
   <p>勉強する番号を選択してください。</p>
 
   <select id="studyNo"></select>
 
-  <button onclick="goStudy()">この論点を勉強する</button>
+  <button onclick="goStudy()">
+    この論点を勉強する
+  </button>
+
+  <p class="small">
+    SS〜EEで囲った部分は赤シート化されます。
+  </p>
+
 </div>
 
 <script>
 const select = document.getElementById("studyNo");
 
-for (let i = 1; i <= 100; i++) {
+for(let i=1;i<=100;i++){
   const option = document.createElement("option");
   option.value = i;
   option.textContent = `論点 ${i}`;
@@ -63,7 +80,7 @@ for (let i = 1; i <= 100; i++) {
 
 function goStudy(){
   const no = select.value;
-  location.href = `${no}/index.html`;
+  location.href = `viewer.html?no=${no}`;
 }
 </script>
 
