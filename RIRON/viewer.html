@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>鑑定理論 Viewer</title>
+
+<style>
+body{
+  margin:0;
+  background:#050505;
+  color:white;
+  font-family:system-ui,"Hiragino Sans","Yu Gothic",sans-serif;
+  line-height:1.9;
+}
+
+section{
+  min-height:100vh;
+  padding:42px 24px;
+  box-sizing:border-box;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  border-bottom:1px solid #333;
+}
+
+.title{
+  background:linear-gradient(160deg,#ff003c,#4b00ff);
+}
+
+.card{
+  background:#101010;
+}
+
+h1{
+  font-size:34px;
+  line-height:1.25;
+}
+
+.text{
+  font-size:22px;
+  font-weight:750;
+}
+
+.redsheet{
+  background:#ff1744;
+  color:transparent;
+  border-radius:8px;
+  padding:2px 8px;
+  cursor:pointer;
+  user-select:none;
+  box-shadow:0 0 12px rgba(255,23,68,.7);
+}
+
+.redsheet.open{
+  background:transparent;
+  color:#00ffcc;
+  font-weight:900;
+  box-shadow:none;
+}
+
+details{
+  background:#1b1b1b;
+  border:1px solid #444;
+  border-radius:14px;
+  padding:16px;
+  margin-top:20px;
+}
+
+summary{
+  color:#ffeb3b;
+  font-weight:900;
+  font-size:20px;
+}
+
+.nav{
+  position:fixed;
+  right:12px;
+  bottom:12px;
+  background:#00ffcc;
+  color:#000;
+  padding:10px 14px;
+  border-radius:999px;
+  font-weight:900;
+  text-decoration:none;
+  z-index:99;
+}
+</style>
+</head>
+
+<body>
+
+<a class="nav" href="./">一覧へ</a>
+
+<section class="title">
+  <h1 id="title">読み込み中...</h1>
+  <p class="text">
+    赤部分をタップすると表示。<br>
+    もう一度タップで再び隠れる。
+  </p>
+</section>
+
+<section class="card">
+
+  <div id="maskedText" class="text"></div>
+
+  <details>
+    <summary>原文を見る</summary>
+    <div id="plainText"></div>
+  </details>
+
+</section>
+
+<script>
+
+const params = new URLSearchParams(location.search);
+const no = params.get("no") || "1";
+
+document.title = `論点 ${no}`;
+
+document.getElementById("title").innerHTML =
+  `論点 ${no}`;
+
+fetch(`data/${no}.txt`)
+.then(res => res.text())
+.then(rawText => {
+
+  function escapeHtml(str){
+    return str
+      .replace(/&/g,"&amp;")
+      .replace(/</g,"&lt;")
+      .replace(/>/g,"&gt;");
+  }
+
+  const escaped = escapeHtml(rawText);
+
+  const masked = escaped
+    .replace(/\n/g,"<br><br>")
+    .replace(/SS(.*?)EE/g,
+      `<span class="redsheet" onclick="this.classList.toggle('open')">$1</span>`
+    );
+
+  document.getElementById("maskedText").innerHTML = masked;
+
+  document.getElementById("plainText").innerHTML =
+    escapeHtml(rawText.replace(/SS|EE/g,""))
+    .replace(/\n/g,"<br><br>");
+
+});
+</script>
+
+</body>
+</html>
