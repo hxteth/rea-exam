@@ -1,26 +1,71 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>鑑定理論</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>鑑定理論メニュー</title>
+<style>
+body{
+  margin:0;
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:linear-gradient(160deg,#050505,#1b004b);
+  color:white;
+  font-family:system-ui,"Hiragino Sans","Yu Gothic",sans-serif;
+}
+.box{
+  width:90%;
+  max-width:420px;
+  padding:28px;
+  background:#111;
+  border:2px solid #00ffcc;
+  border-radius:22px;
+  box-shadow:0 0 30px rgba(0,255,204,.25);
+}
+h1{font-size:28px;}
+select,button{
+  width:100%;
+  margin-top:18px;
+  padding:16px;
+  font-size:20px;
+  border-radius:14px;
+  border:none;
+}
+button{
+  background:#00ffcc;
+  color:#000;
+  font-weight:900;
+}
+</style>
 </head>
 <body>
 
+<div class="box">
   <h1>鑑定理論ページへようこそ 🐰</h1>
+  <p>勉強する番号を選択してください。</p>
 
-  <p>論点番号を選んでください。</p>
+  <select id="studyNo"></select>
 
-  <h2>論点一覧</h2>
+  <button onclick="goStudy()">この論点を勉強する</button>
+</div>
 
-  <ul>
-    <!-- 1〜100へのリンク -->
-    <script>
-      for (let i = 1; i <= 100; i++) {
-        document.write(`<li><a href="${i}/index.html">論点 ${i}</a></li>`);
-      }
-    </script>
-  </ul>
+<script>
+const select = document.getElementById("studyNo");
+
+for (let i = 1; i <= 100; i++) {
+  const option = document.createElement("option");
+  option.value = i;
+  option.textContent = `論点 ${i}`;
+  select.appendChild(option);
+}
+
+function goStudy(){
+  const no = select.value;
+  location.href = `${no}/index.html`;
+}
+</script>
 
 </body>
 </html>
