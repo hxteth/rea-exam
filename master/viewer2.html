@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>鑑定理論 Viewer</title>
+<title>鑑定理論タイピングテスト</title>
 
 <style>
 body{
@@ -11,7 +11,7 @@ body{
   background:#050505;
   color:white;
   font-family:system-ui,"Hiragino Sans","Yu Gothic",sans-serif;
-  line-height:1.9;
+  line-height:1.8;
 }
 section{
   min-height:100vh;
@@ -32,39 +32,11 @@ section{
 }
 h1{font-size:34px;line-height:1.25;}
 h2{color:#ffeb3b;}
-.text{font-size:22px;font-weight:750;}
+.text{font-size:21px;font-weight:750;}
 .headingText{font-size:34px;font-weight:950;line-height:1.35;}
-.redsheet{
-  background:#ff1744;
-  color:transparent;
-  border-radius:8px;
-  padding:2px 8px;
-  cursor:pointer;
-  user-select:none;
-  box-shadow:0 0 12px rgba(255,23,68,.7);
-}
-.redsheet.open{
-  background:transparent;
-  color:#00ffcc;
-  font-weight:900;
-  box-shadow:none;
-}
-details{
-  background:#1b1b1b;
-  border:1px solid #444;
-  border-radius:14px;
-  padding:16px;
-  margin-top:20px;
-}
-summary{
-  color:#ffeb3b;
-  font-weight:900;
-  font-size:20px;
-  cursor:pointer;
-}
 textarea{
   width:100%;
-  min-height:140px;
+  min-height:180px;
   margin-top:20px;
   padding:14px;
   box-sizing:border-box;
@@ -92,8 +64,33 @@ button{
   background:#222;
   font-weight:900;
 }
+.hit{color:#fff;font-weight:900;}
+.miss{color:#ff4d6d;font-weight:900;text-decoration:underline;}
+.extra{color:#00ffcc;font-weight:900;}
 .good{color:#00ffcc;}
 .bad{color:#ff4d6d;}
+.compareBox{
+  margin-top:16px;
+  padding:14px;
+  border-radius:14px;
+  background:#111;
+  border:1px solid #444;
+  font-size:18px;
+  line-height:1.9;
+}
+details{
+  background:#1b1b1b;
+  border:1px solid #444;
+  border-radius:14px;
+  padding:16px;
+  margin-top:20px;
+}
+summary{
+  color:#ffeb3b;
+  font-weight:900;
+  font-size:20px;
+  cursor:pointer;
+}
 .nav{
   position:fixed;
   right:12px;
@@ -116,8 +113,9 @@ button{
 <section class="title">
   <h1 id="title">読み込み中...</h1>
   <p class="text">
-    赤シート → 全入力 → 採点。<br>
-    最後にChatGPT採点用レポートも作れる。
+    SEPごとにブロック化。<br>
+    SS / EE は自動で読み飛ばし。<br>
+    本文を覚えて入力し、採点。
   </p>
 </section>
 
@@ -137,32 +135,53 @@ const no = params.get("no") || "1";
 document.title = `論点 ${no}`;
 document.getElementById("title").innerHTML = `論点 ${no}`;
 
-const answers = [];
-const results = [];
+const blocksData = [];
+
+function stripMarks(str){
+  return str.replace(/SS|EE/g,"");
+}
 
 function escapeHtml(str){
   return str.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
 }
 
 function normalize(str){
-  return str.replace(/\s/g,"").replace(/[、。，．・「」『』（）()]/g,"");
+  return stripMarks(str)
+    .replace(/\s/g,"")
+    .replace(/[、。，．・「」『』（）()]/g,"")
+    .replace(/　/g,"");
 }
 
-function toMaskedHtml(text){
-  return escapeHtml(text)
-    .replace(/\n/g,"<br><br>")
-    .replace(/SS(.*?)EE/g,
-      `<span class="redsheet" onclick="this.classList.toggle('open')">$1</span>`
-    );
+function splitUnits(str){
+  return normalize(str).split("");
 }
 
-function toPlainText(text){
-  return text.replace(/SS|EE/g,"");
-}
+function compareText(original, input){
+  const o = splitUnits(original);
+  const u = splitUnits(input);
 
-function extractKeywords(text){
-  const matches = [...text.matchAll(/SS([\s\S]*?)EE/g)];
-  return matches.map(m => m[1].trim()).filter(Boolean);
+  let hit = 0;
+  let resultHtml = "";
+
+  const max = Math.max(o.length, u.length);
+
+  for(let i=0;i<max;i++){
+    const originalChar = o[i] || "";
+    const inputChar = u[i] || "";
+
+    if(originalChar && inputChar && originalChar === inputChar){
+      hit++;
+      resultHtml += `<span class="hit">${escapeHtml(originalChar)}</span>`;
+    }else if(originalChar){
+      resultHtml += `<span class="miss">${escapeHtml(originalChar)}</span>`;
+    }else if(inputChar){
+      resultHtml += `<span class="extra">${escapeHtml(inputChar)}</span>`;
+    }
+  }
+
+  const rate = o.length === 0 ? 100 : Math.round(hit / o.length * 100);
+
+  return {rate, hit, total:o.length, resultHtml};
 }
 
 fetch(`data/${no}.txt`)
@@ -171,114 +190,107 @@ fetch(`data/${no}.txt`)
   return res.text();
 })
 .then(rawText => {
-  const blocks = rawText.split("SEP").map(b => b.trim()).filter(Boolean);
+  const blocks = rawText
+    .split("SEP")
+    .map(b => b.trim())
+    .filter(Boolean);
+
   const content = document.getElementById("content");
 
-  blocks.forEach((block, index) => {
-    const hasRedSheet = /SS[\s\S]*?EE/.test(block);
+  blocks.forEach((rawBlock, index) => {
+    const block = stripMarks(rawBlock);
     const section = document.createElement("section");
 
-    if(!hasRedSheet){
+    if(block.length <= 40 && !/[。！？]/.test(block)){
       section.className = "heading";
       section.innerHTML = `<div class="headingText">${escapeHtml(block).replace(/\n/g,"<br>")}</div>`;
       content.appendChild(section);
       return;
     }
 
-    const plain = toPlainText(block);
-    const keywords = extractKeywords(block);
-    const answerIndex = answers.length;
-
-    answers.push({
-      blockNo: answerIndex + 1,
-      plain,
-      keywords,
+    const dataIndex = blocksData.length;
+    blocksData.push({
+      blockNo:dataIndex + 1,
+      original:block,
+      rawOriginal:rawBlock,
       userInput:"",
-      score:null,
-      missed:[]
+      score:null
     });
 
     const cardClasses = ["cardA","cardB","cardC"];
     section.className = cardClasses[index % cardClasses.length];
 
     section.innerHTML = `
-      <h2>ブロック ${answerIndex + 1}</h2>
+      <h2>ブロック ${dataIndex + 1}</h2>
 
-      <div class="text">${toMaskedHtml(block)}</div>
-
-      <details>
-        <summary>原文を見る</summary>
-        <div>${escapeHtml(plain).replace(/\n/g,"<br><br>")}</div>
+      <details open>
+        <summary>暗記対象本文</summary>
+        <div class="text">${escapeHtml(block).replace(/\n/g,"<br><br>")}</div>
       </details>
 
-      <textarea id="input-${answerIndex}" placeholder="ここに思い出して入力"></textarea>
+      <textarea id="input-${dataIndex}" placeholder="ここに思い出して入力"></textarea>
 
-      <button onclick="scoreBlock(${answerIndex})">このブロックを採点</button>
+      <button onclick="scoreBlock(${dataIndex})">このブロックを採点</button>
 
-      <div id="result-${answerIndex}" class="result"></div>
+      <div id="result-${dataIndex}" class="result"></div>
     `;
 
     content.appendChild(section);
   });
 
   loadHistory();
+})
+.catch(err => {
+  document.getElementById("content").innerHTML = `
+    <section class="cardA">
+      <p class="text bad">${escapeHtml(err.message)}</p>
+    </section>
+  `;
 });
-  
+
 function scoreBlock(i){
   const input = document.getElementById(`input-${i}`).value;
-  const data = answers[i];
+  const data = blocksData[i];
+
+  const compare = compareText(data.original, input);
 
   data.userInput = input;
-
-  const normalizedInput = normalize(input);
-  const missed = [];
-
-  data.keywords.forEach(kw => {
-    if(!normalizedInput.includes(normalize(kw))){
-      missed.push(kw);
-    }
-  });
-
-  const total = data.keywords.length;
-  const hit = total - missed.length;
-  const score = total === 0 ? 100 : Math.round(hit / total * 100);
-
-  data.score = score;
-  data.missed = missed;
+  data.score = compare.rate;
 
   const result = document.getElementById(`result-${i}`);
 
   result.innerHTML = `
-    <div class="${score >= 80 ? "good" : "bad"}">
-      ${score}点 / キーワード ${hit}/${total}
+    <div class="${compare.rate >= 80 ? "good" : "bad"}">
+      ${compare.rate}点 / 一致 ${compare.hit}/${compare.total}
     </div>
-    ${
-      missed.length
-      ? `<div class="bad">不足：${missed.map(escapeHtml).join("、")}</div>`
-      : `<div class="good">主要キーワードOK</div>`
-    }
+
+    <div class="compareBox">
+      <strong>原文ベース比較：</strong><br>
+      ${compare.resultHtml}
+    </div>
   `;
 
   saveHistory();
 }
 
 function showReport(){
-  const done = answers.filter(a => a.score !== null);
+  const done = blocksData.filter(b => b.score !== null);
+
   if(done.length === 0){
     document.getElementById("report").innerHTML = "まだ採点結果がありません。";
     return;
   }
 
-  const avg = Math.round(done.reduce((sum,a)=>sum+a.score,0) / done.length);
+  const avg = Math.round(done.reduce((sum,b)=>sum+b.score,0) / done.length);
 
   let html = `<p>平均点：<span class="${avg>=80?'good':'bad'}">${avg}点</span></p>`;
 
-  done.forEach(a => {
+  done.forEach(b => {
     html += `
       <details>
-        <summary>ブロック ${a.blockNo}：${a.score}点</summary>
-        <p>不足：${a.missed.length ? a.missed.map(escapeHtml).join("、") : "なし"}</p>
-        <p><strong>入力答案：</strong><br>${escapeHtml(a.userInput).replace(/\n/g,"<br>")}</p>
+        <summary>ブロック ${b.blockNo}：${b.score}点</summary>
+        <p><strong>原文：</strong><br>${escapeHtml(b.original).replace(/\n/g,"<br>")}</p>
+        <p><strong>入力：</strong><br>${escapeHtml(b.userInput).replace(/\n/g,"<br>")}</p>
       </details>
     `;
   });
@@ -287,15 +299,14 @@ function showReport(){
 }
 
 function copyForChatGPT(){
-  let text = `以下は不動産鑑定士試験の暗記答案です。厳しめに採点し、足りないキーワード、表現のズレ、改善答案を示してください。\n\n`;
+  let text = `以下は不動産鑑定士試験の暗記答案です。原文と私の入力を比較し、厳しめに採点してください。重要語句の抜け、表現のズレ、改善答案を示してください。\n\n`;
   text += `【論点番号】${no}\n\n`;
 
-  answers.forEach(a => {
+  blocksData.forEach(b => {
     text += `---\n`;
-    text += `【ブロック${a.blockNo} 原文】\n${a.plain}\n\n`;
-    text += `【私の答案】\n${a.userInput || "未入力"}\n\n`;
-    text += `【自己採点】${a.score === null ? "未採点" : a.score + "点"}\n`;
-    text += `【不足キーワード】${a.missed.length ? a.missed.join("、") : "なし"}\n\n`;
+    text += `【ブロック${b.blockNo} 原文】\n${b.original}\n\n`;
+    text += `【私の入力】\n${b.userInput || "未入力"}\n\n`;
+    text += `【簡易採点】${b.score === null ? "未採点" : b.score + "点"}\n\n`;
   });
 
   navigator.clipboard.writeText(text).then(() => {
@@ -304,38 +315,30 @@ function copyForChatGPT(){
 }
 
 function saveHistory(){
-  const key = `riron-${no}-history`;
-  localStorage.setItem(key, JSON.stringify({
+  localStorage.setItem(`riron-typing-${no}`, JSON.stringify({
     savedAt:new Date().toISOString(),
-    answers
+    blocksData
   }));
 }
 
 function loadHistory(){
-  const key = `riron-${no}-history`;
-  const saved = localStorage.getItem(key);
+  const saved = localStorage.getItem(`riron-typing-${no}`);
   if(!saved) return;
 
   try{
     const data = JSON.parse(saved);
-    data.answers.forEach((a,i)=>{
-      if(!answers[i]) return;
-      answers[i].userInput = a.userInput || "";
-      answers[i].score = a.score;
-      answers[i].missed = a.missed || [];
+    data.blocksData.forEach((b,i)=>{
+      if(!blocksData[i]) return;
+
+      blocksData[i].userInput = b.userInput || "";
+      blocksData[i].score = b.score;
 
       const input = document.getElementById(`input-${i}`);
-      if(input) input.value = answers[i].userInput;
+      if(input) input.value = blocksData[i].userInput;
 
-      if(a.score !== null){
-        const result = document.getElementById(`result-${i}`);
-        if(result){
-          result.innerHTML = `
-            <div class="${a.score >= 80 ? "good" : "bad"}">
-              前回保存：${a.score}点
-            </div>
-          `;
-        }
+      const result = document.getElementById(`result-${i}`);
+      if(result && b.score !== null){
+        result.innerHTML = `<div class="${b.score >= 80 ? "good" : "bad"}">前回保存：${b.score}点</div>`;
       }
     });
   }catch(e){}
