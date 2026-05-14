@@ -4,119 +4,33 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>鑑定理論タイピングテスト</title>
-
 <style>
-body{
-  margin:0;
-  background:#050505;
-  color:white;
-  font-family:system-ui,"Hiragino Sans","Yu Gothic",sans-serif;
-  line-height:1.8;
-}
-section{
-  min-height:100vh;
-  padding:42px 24px;
-  box-sizing:border-box;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  border-bottom:1px solid #333;
-}
-.title{background:linear-gradient(160deg,#ff003c,#4b00ff);}
-.cardA{background:#101010;}
-.cardB{background:#160022;}
-.cardC{background:#001f1d;}
-.heading{
-  text-align:center;
-  background:linear-gradient(160deg,#ffcc00,#ff003c);
-}
-h1{font-size:34px;line-height:1.25;}
-h2{color:#ffeb3b;}
-.text{font-size:21px;font-weight:750;}
-.headingText{font-size:34px;font-weight:950;line-height:1.35;}
-textarea{
-  width:100%;
-  min-height:180px;
-  margin-top:20px;
-  padding:14px;
-  box-sizing:border-box;
-  border-radius:14px;
-  border:2px solid #333;
-  background:#050505;
-  color:white;
-  font-size:18px;
-  line-height:1.7;
-}
-button{
-  margin-top:14px;
-  padding:14px;
-  border:none;
-  border-radius:14px;
-  background:#00ffcc;
-  color:#000;
-  font-weight:900;
-  font-size:18px;
-}
-.result{
-  margin-top:16px;
-  padding:14px;
-  border-radius:14px;
-  background:#222;
-  font-weight:900;
-}
-.hit{color:#fff;font-weight:900;}
-.miss{color:#ff4d6d;font-weight:900;text-decoration:underline;}
-.extra{color:#00ffcc;font-weight:900;}
-.good{color:#00ffcc;}
-.bad{color:#ff4d6d;}
-.compareBox{
-  margin-top:16px;
-  padding:14px;
-  border-radius:14px;
-  background:#111;
-  border:1px solid #444;
-  font-size:18px;
-  line-height:1.9;
-}
-details{
-  background:#1b1b1b;
-  border:1px solid #444;
-  border-radius:14px;
-  padding:16px;
-  margin-top:20px;
-}
-summary{
-  color:#ffeb3b;
-  font-weight:900;
-  font-size:20px;
-  cursor:pointer;
-}
-.nav{
-  position:fixed;
-  right:12px;
-  bottom:12px;
-  background:#00ffcc;
-  color:#000;
-  padding:10px 14px;
-  border-radius:999px;
-  font-weight:900;
-  text-decoration:none;
-  z-index:99;
-}
+body{margin:0;background:#050505;color:#fff;font-family:system-ui,"Hiragino Sans","Yu Gothic",sans-serif;line-height:1.8}
+section{min-height:100vh;padding:42px 24px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;border-bottom:1px solid #333}
+.title{background:linear-gradient(160deg,#ff003c,#4b00ff)}
+.cardA{background:#101010}.cardB{background:#160022}.cardC{background:#001f1d}
+.heading{text-align:center;background:linear-gradient(160deg,#ffcc00,#ff003c)}
+h1{font-size:34px;line-height:1.25} h2{color:#ffeb3b}
+.text{font-size:21px;font-weight:750}.headingText{font-size:34px;font-weight:950}
+textarea{width:100%;min-height:210px;margin-top:20px;padding:14px;box-sizing:border-box;border-radius:14px;border:2px solid #333;background:#050505;color:white;font-size:18px;line-height:1.7}
+button{margin-top:14px;padding:14px;border:none;border-radius:14px;background:#00ffcc;color:#000;font-weight:900;font-size:18px}
+.result{margin-top:16px;padding:14px;border-radius:14px;background:#222;font-weight:900}
+.hit{color:#fff;font-weight:900}.miss{color:#ff4d6d;font-weight:900;text-decoration:underline}
+.good{color:#00ffcc}.bad{color:#ff4d6d}
+.compareBox{margin-top:16px;padding:14px;border-radius:14px;background:#111;border:1px solid #444;font-size:18px;line-height:1.9}
+details{background:#1b1b1b;border:1px solid #444;border-radius:14px;padding:16px;margin-top:20px}
+summary{color:#ffeb3b;font-weight:900;font-size:20px;cursor:pointer}
+.nav{position:fixed;right:12px;bottom:12px;background:#00ffcc;color:#000;padding:10px 14px;border-radius:999px;font-weight:900;text-decoration:none;z-index:99}
+.label{color:#00ffcc;font-weight:900}
 </style>
 </head>
 
 <body>
-
 <a class="nav" href="./">一覧へ</a>
 
 <section class="title">
   <h1 id="title">読み込み中...</h1>
-  <p class="text">
-    SEPごとにブロック化。<br>
-    SS / EE は自動で読み飛ばし。<br>
-    本文を覚えて入力し、採点。
-  </p>
+  <p class="text">小問・小タイトルだけ見て、本文を入力。<br>採点後に原文確認。</p>
 </section>
 
 <div id="content"></div>
@@ -131,7 +45,6 @@ summary{
 <script>
 const params = new URLSearchParams(location.search);
 const no = params.get("no") || "1";
-
 document.title = `論点 ${no}`;
 document.getElementById("title").innerHTML = `論点 ${no}`;
 
@@ -148,40 +61,70 @@ function escapeHtml(str){
 function normalize(str){
   return stripMarks(str)
     .replace(/\s/g,"")
-    .replace(/[、。，．・「」『』（）()]/g,"")
+    .replace(/[、。，．・「」『』（）()「」『』【】\[\]・]/g,"")
     .replace(/　/g,"");
 }
 
-function splitUnits(str){
-  return normalize(str).split("");
-}
+function cleanBlock(raw){
+  const lines = stripMarks(raw).split(/\r?\n/).map(l => l.trim()).filter(Boolean);
 
-function compareText(original, input){
-  const o = splitUnits(original);
-  const u = splitUnits(input);
+  let question = "";
+  let subtitle = "";
+  const bodyLines = [];
 
-  let hit = 0;
-  let resultHtml = "";
-
-  const max = Math.max(o.length, u.length);
-
-  for(let i=0;i<max;i++){
-    const originalChar = o[i] || "";
-    const inputChar = u[i] || "";
-
-    if(originalChar && inputChar && originalChar === inputChar){
-      hit++;
-      resultHtml += `<span class="hit">${escapeHtml(originalChar)}</span>`;
-    }else if(originalChar){
-      resultHtml += `<span class="miss">${escapeHtml(originalChar)}</span>`;
-    }else if(inputChar){
-      resultHtml += `<span class="extra">${escapeHtml(inputChar)}</span>`;
+  for(const line of lines){
+    if(/^小問/.test(line)){
+      question = line;
+      continue;
     }
+    if(/^解答小タイトル/.test(line)){
+      subtitle = line.replace(/^解答小タイトル[:：]?\s*/,"");
+      continue;
+    }
+    if(/^解答本文/.test(line)){
+      continue;
+    }
+    if(/^問題文/.test(line)){
+      question = line;
+      continue;
+    }
+    bodyLines.push(line);
   }
 
-  const rate = o.length === 0 ? 100 : Math.round(hit / o.length * 100);
+  return {
+    question,
+    subtitle,
+    body: bodyLines.join("\n")
+  };
+}
 
-  return {rate, hit, total:o.length, resultHtml};
+function splitSentences(text){
+  return text
+    .split(/(?<=。)|(?<=！)|(?<=？)|\n/)
+    .map(s => s.trim())
+    .filter(Boolean);
+}
+
+function compareBySentences(original, input){
+  const sentences = splitSentences(original);
+  const normalizedInput = normalize(input);
+
+  let hit = 0;
+  let html = "";
+
+  sentences.forEach(s => {
+    const key = normalize(s);
+    const ok = key.length > 0 && normalizedInput.includes(key);
+
+    if(ok) hit++;
+
+    html += ok
+      ? `<p class="hit">○ ${escapeHtml(s)}</p>`
+      : `<p class="miss">× ${escapeHtml(s)}</p>`;
+  });
+
+  const rate = sentences.length === 0 ? 100 : Math.round(hit / sentences.length * 100);
+  return {rate, hit, total:sentences.length, html};
 }
 
 fetch(`data/${no}.txt`)
@@ -190,20 +133,17 @@ fetch(`data/${no}.txt`)
   return res.text();
 })
 .then(rawText => {
-  const blocks = rawText
-    .split("SEP")
-    .map(b => b.trim())
-    .filter(Boolean);
-
+  const rawBlocks = rawText.split("SEP").map(b => b.trim()).filter(Boolean);
   const content = document.getElementById("content");
 
-  blocks.forEach((rawBlock, index) => {
-    const block = stripMarks(rawBlock);
-    const section = document.createElement("section");
+  rawBlocks.forEach((rawBlock, index) => {
+    const cleaned = cleanBlock(rawBlock);
 
-    if(block.length <= 40 && !/[。！？]/.test(block)){
+    // 本文がないブロックは見出し扱い
+    if(!cleaned.body){
+      const section = document.createElement("section");
       section.className = "heading";
-      section.innerHTML = `<div class="headingText">${escapeHtml(block).replace(/\n/g,"<br>")}</div>`;
+      section.innerHTML = `<div class="headingText">${escapeHtml(stripMarks(rawBlock)).replace(/\n/g,"<br>")}</div>`;
       content.appendChild(section);
       return;
     }
@@ -211,24 +151,23 @@ fetch(`data/${no}.txt`)
     const dataIndex = blocksData.length;
     blocksData.push({
       blockNo:dataIndex + 1,
-      original:block,
-      rawOriginal:rawBlock,
+      question:cleaned.question,
+      subtitle:cleaned.subtitle,
+      original:cleaned.body,
       userInput:"",
       score:null
     });
 
-    const cardClasses = ["cardA","cardB","cardC"];
-    section.className = cardClasses[index % cardClasses.length];
+    const section = document.createElement("section");
+    section.className = ["cardA","cardB","cardC"][index % 3];
 
     section.innerHTML = `
       <h2>ブロック ${dataIndex + 1}</h2>
 
-      <details open>
-        <summary>暗記対象本文</summary>
-        <div class="text">${escapeHtml(block).replace(/\n/g,"<br><br>")}</div>
-      </details>
+      ${cleaned.question ? `<p class="text"><span class="label">小問：</span>${escapeHtml(cleaned.question)}</p>` : ""}
+      ${cleaned.subtitle ? `<p class="text"><span class="label">小タイトル：</span>${escapeHtml(cleaned.subtitle)}</p>` : ""}
 
-      <textarea id="input-${dataIndex}" placeholder="ここに思い出して入力"></textarea>
+      <textarea id="input-${dataIndex}" placeholder="ここに解答本文を思い出して入力"></textarea>
 
       <button onclick="scoreBlock(${dataIndex})">このブロックを採点</button>
 
@@ -241,33 +180,31 @@ fetch(`data/${no}.txt`)
   loadHistory();
 })
 .catch(err => {
-  document.getElementById("content").innerHTML = `
-    <section class="cardA">
-      <p class="text bad">${escapeHtml(err.message)}</p>
-    </section>
-  `;
+  document.getElementById("content").innerHTML = `<section class="cardA"><p class="text bad">${escapeHtml(err.message)}</p></section>`;
 });
 
 function scoreBlock(i){
   const input = document.getElementById(`input-${i}`).value;
   const data = blocksData[i];
-
-  const compare = compareText(data.original, input);
+  const compare = compareBySentences(data.original, input);
 
   data.userInput = input;
   data.score = compare.rate;
 
-  const result = document.getElementById(`result-${i}`);
-
-  result.innerHTML = `
+  document.getElementById(`result-${i}`).innerHTML = `
     <div class="${compare.rate >= 80 ? "good" : "bad"}">
       ${compare.rate}点 / 一致 ${compare.hit}/${compare.total}
     </div>
 
     <div class="compareBox">
-      <strong>原文ベース比較：</strong><br>
-      ${compare.resultHtml}
+      <strong>文単位チェック：</strong><br>
+      ${compare.html}
     </div>
+
+    <details>
+      <summary>原文を見る</summary>
+      <div>${escapeHtml(data.original).replace(/\n/g,"<br><br>")}</div>
+    </details>
   `;
 
   saveHistory();
@@ -275,20 +212,19 @@ function scoreBlock(i){
 
 function showReport(){
   const done = blocksData.filter(b => b.score !== null);
-
   if(done.length === 0){
     document.getElementById("report").innerHTML = "まだ採点結果がありません。";
     return;
   }
 
   const avg = Math.round(done.reduce((sum,b)=>sum+b.score,0) / done.length);
-
   let html = `<p>平均点：<span class="${avg>=80?'good':'bad'}">${avg}点</span></p>`;
 
   done.forEach(b => {
     html += `
       <details>
         <summary>ブロック ${b.blockNo}：${b.score}点</summary>
+        <p><strong>小タイトル：</strong>${escapeHtml(b.subtitle || "")}</p>
         <p><strong>原文：</strong><br>${escapeHtml(b.original).replace(/\n/g,"<br>")}</p>
         <p><strong>入力：</strong><br>${escapeHtml(b.userInput).replace(/\n/g,"<br>")}</p>
       </details>
@@ -299,19 +235,19 @@ function showReport(){
 }
 
 function copyForChatGPT(){
-  let text = `以下は不動産鑑定士試験の暗記答案です。原文と私の入力を比較し、厳しめに採点してください。重要語句の抜け、表現のズレ、改善答案を示してください。\n\n`;
+  let text = `以下は不動産鑑定士試験の暗記答案です。原文と私の入力を比較し、重要語句の抜け、表現のズレ、改善答案を示してください。\n\n`;
   text += `【論点番号】${no}\n\n`;
 
   blocksData.forEach(b => {
     text += `---\n`;
-    text += `【ブロック${b.blockNo} 原文】\n${b.original}\n\n`;
+    text += `【小問】${b.question || ""}\n`;
+    text += `【小タイトル】${b.subtitle || ""}\n`;
+    text += `【原文】\n${b.original}\n\n`;
     text += `【私の入力】\n${b.userInput || "未入力"}\n\n`;
     text += `【簡易採点】${b.score === null ? "未採点" : b.score + "点"}\n\n`;
   });
 
-  navigator.clipboard.writeText(text).then(() => {
-    alert("ChatGPT採点用テキストをコピーしました");
-  });
+  navigator.clipboard.writeText(text).then(() => alert("ChatGPT採点用テキストをコピーしました"));
 }
 
 function saveHistory(){
@@ -329,7 +265,6 @@ function loadHistory(){
     const data = JSON.parse(saved);
     data.blocksData.forEach((b,i)=>{
       if(!blocksData[i]) return;
-
       blocksData[i].userInput = b.userInput || "";
       blocksData[i].score = b.score;
 
@@ -344,6 +279,5 @@ function loadHistory(){
   }catch(e){}
 }
 </script>
-
 </body>
 </html>
